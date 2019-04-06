@@ -1,0 +1,55 @@
+- model: important-model
+  description:
+    State of the art for Next Big Thing
+
+    Published results available at s3://arya-results
+
+  operations:
+
+    # -----------------------------------------------------
+
+    train:
+      description: Train model
+      default: yes
+      main: train
+      flags:
+        dropout:
+          description: Dropout rate
+          default: 0.2
+        lr:
+          description: Learning rate
+          default: 0.001
+        batch_size:
+          description: Training batch size
+          default: 128
+        epochs:
+          description: Number of epochs to train
+          default: 3
+        random_seed:
+          description: Random seed used for model init
+          default: 312
+
+    # -----------------------------------------------------
+
+    key-findings:
+      description:
+        Recreate key findings
+
+        - Recreate published results
+
+        - Search for optimal dropout
+
+        - Identify dropout falloff
+
+      steps:
+        - run: train
+          label: published-results
+
+        - run: train dropout=uniform[0.0:0.99] epochs=1
+          optimizer: gaussian
+          max-trials: 5
+          random-seed: 312
+          label: dropout-search
+
+        - run: train dropout=[0.8,0.9,0.95,0.99] epochs=1
+          label: dropout-falloff
